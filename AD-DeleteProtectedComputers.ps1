@@ -9,6 +9,9 @@ $usr = $env:USERNAME
 $usr = (Get-ADUser $usr).name
 $filepath = '{0}\Logs\disabledcomputers.txt' -f $env:SystemDrive
 
+# Change this to reflect the distinguished name for your disabled computers OU
+$dis_Ou = "ou=Disabled computers,dc=Domain,dc=com"
+
 # Calls the list of computers to be disabled. 
 $computers = get-content "C:\disabled computer.txt" 
 
@@ -35,7 +38,7 @@ Foreach ($computer in $computers){
     $ou = (Get-ADComputer $adcomputer -Properties canonicalname).canonicalname
     Set-ADComputer $adComputer -Description ("Disabled on $date by $usr // $ou")
     $adcomputer | disable-adaccount
-    $adcomputer | move-adobject -targetpath "OU location by Distinguished Name"
+    $adcomputer | move-adobject -targetpath $dis_ou
     write-host ("$date - " + "$Computer " + "in " + "$ou " +"has been disabled by $usr")
     ("$date - " + "$Computer " + "in " + "$ou " +"was disabled by $usr") | Out-File -FilePath $filepath -force -append -width 200
     }
