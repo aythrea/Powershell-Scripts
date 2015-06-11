@@ -23,7 +23,7 @@ Foreach ($computer in $computers){
     $ou = (Get-ADComputer $adcomputer -Properties canonicalname).canonicalname
     Set-ADComputer $adComputer -Description ("Disabled on $date by $usr // $ou")
     $adcomputer | disable-adaccount
-    $adcomputer | move-adobject -targetpath "OU=Disabled,OU=DataCenterDC4,OU=Servers,DC=dc4,DC=hosting,DC=infor,DC=com"
+    $adcomputer | move-adobject -targetpath "OU Distinguished name"
     write-host ("$date - " + "$Computer " + "in " + "$ou " +" has been disabled by $usr")
     ("$date - " + "$Computer " + "in " + "$ou " +" was disabled by $usr") | Out-File -FilePath $filepath -append -width 200
     }
