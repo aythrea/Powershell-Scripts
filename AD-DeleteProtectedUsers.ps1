@@ -8,7 +8,7 @@ $usr = $env:USERNAME
 
 # Disabled Date
 $disdate = get-date -f "MMM"
-# Deletion Date
+# Deletion Date - Change the numeral in .addmonths to change the duration.
 $deldate = (get-date).addmonths(2).tostring('MMM')
 # Combined Dates to be used for OU placement
 $comdate = "$disdate-$deldate"
