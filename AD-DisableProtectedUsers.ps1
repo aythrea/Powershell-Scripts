@@ -51,7 +51,7 @@ $aduser = Get-ADuser $user
     Set-ADuser $aduser -Description ("Disabled on $date by $usr // $ou")
     $aduser | disable-adaccount
     $aduser | move-adobject -targetpath "$disusr"
-    write-host ("Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate")
+    write-host ("Account Disabled by $adusr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate")
     ("Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate") | Out-File -FilePath $filepath -force -append -width 200
     # send confirmation email-- configure $recipient and $mailserver above
     send-mailmessage -to "$recipient" -from "donotreply@somewhere.tld" -subject "Disable Account Confirmation" -Body "Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate" -smtpserver $mailserver
