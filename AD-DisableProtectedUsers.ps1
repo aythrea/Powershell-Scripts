@@ -46,7 +46,7 @@ $aduser = Get-ADuser $user
     $password = ([char[]](Get-Random -Input $(48..57 + 65..90 + 97..122) -Count 16)) -join ""
     $ou = (Get-ADuser $aduser -Properties canonicalname).canonicalname
     # Set the aduser's password
-    Set-ADAccountPassword $usr.name -NewPassword (ConvertTo-SecureString -AsPlainText "$password" -force)
+    Set-ADAccountPassword $aduser.name -NewPassword (ConvertTo-SecureString -AsPlainText "$password" -force)
     # set aduser's description, move the account, disable account
     Set-ADuser $aduser -Description ("Disabled on $date by $usr // $ou")
     $aduser | disable-adaccount
