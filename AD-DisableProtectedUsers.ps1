@@ -50,5 +50,7 @@ $aduser = Get-ADuser $user
     write-host ("Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate")
     ("Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate") | Out-File -FilePath $filepath -force -append -width 200
     send-mailmessage -to "$recaddress" -from "$destaddress" -subject "Disable Account Confirmation" -Body "Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate" -smtpserver $mailserver
+
+
     }
 }
