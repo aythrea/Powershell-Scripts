@@ -3,9 +3,11 @@
 Import-Module ActiveDirectory
 $date = get-date -format "d MMM yyyy"
 $usr = (Get-ADUser $usr).name
-$filepath = '{0}\Logs\terms.log' -f $env:SystemDrive
+$scriptpath = '{0}\scripts' -f $env:SystemDrive
+$filepath = '{0}\scripts\Logs\terms.log' -f $env:SystemDrive
+$terms = '{0}\scripts\terms.txt' -f $env:SystemDrive
 $usr = $env:USERNAME
-$users = get-content "C:\terms.txt"
+$users = get-content "$terms"
 
 ## Global Variables
 # Get the current month, add value, combine to find deletion date OU
@@ -21,6 +23,7 @@ $DenyLocLog = "DenyLogonGroup"
 $mailserver = "relayhost.domain.tld"
 $recAddres = "address@domain.tld"
 $destAddress = "address@domain.tld"
+$emailbody = "Account Disabled by $usr on $date Disabled in $disdate to be deleted in $deldate"
 
 ## The Action
 # Calls the list of users to be disabled.
@@ -47,10 +50,10 @@ $aduser = Get-ADuser $user
     # Comment the next line if you don't have a deny local logon group
     add-adgroupmember $DenyLocLog $aduser
     # Logging and Email Confirmation
-    write-host ("Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate")
-    ("Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate") | Out-File -FilePath $filepath -force -append -width 200
-    send-mailmessage -to "$recaddress" -from "$destaddress" -subject "Disable Account Confirmation" -Body "Account Disabled by $usr" + " on $date" + " Disabled in $disdate" + " to be deleted on $deldate" -smtpserver $mailserver
-
-
+    write-host ("$emailbody")
+    ("$emailbody") | Out-File -FilePath $filepath -force -append -width 200
+    send-mailmessage -to "$recaddress" -from "$destaddress" -subject "Disable Account Confirmation" -Body "$emailbody" -smtpserver $mailserver
     }
 }
+Rename-Item -path $terms -NewName terms_$date.log
+new-item -path $scriptpath -name terms.txt -ItemType "file"
