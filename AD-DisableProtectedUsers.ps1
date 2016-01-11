@@ -2,7 +2,6 @@
 
 Import-Module ActiveDirectory
 $date = get-date -format "d MMM yyyy"
-$usr = (Get-ADUser $usr).name
 $scriptpath = '{0}\scripts' -f $env:SystemDrive
 $filepath = '{0}\scripts\Logs\terms.log' -f $env:SystemDrive
 $terms = '{0}\scripts\terms.txt' -f $env:SystemDrive
@@ -15,9 +14,9 @@ $disdate = get-date -f "MMM"
 $deldate = (get-date).addmonths(2).tostring('MMM')
 $comdate = "$disdate-$deldate"
 # Disabled User destination - Requires Distinguished name
-$DisUsr = "OU=$comdate,OU=Disabled,OU=Accounts,DC=Contoso,DC=com"
+$DisUsr = "OU=$comdate,OU=Disabled,OU=Accounts,DC=stage,DC=contoso,DC=local"
 # Comment this if you don't have a deny local logon group.
-$DenyLocLog = "DenyLogonGroup"
+# $DenyLocLog = "DenyLogonGroup"
 
 ## SMTP Relay Server 
 $mailserver = "relayhost.domain.tld"
@@ -42,18 +41,26 @@ $aduser = Get-ADuser $user
              }    
     # Housekeeping tasks - Sequential: Generate and apply randomized password, Update account description move account to disabled ou, log changes
     $password = ([char[]](Get-Random -Input $(48..57 + 65..90 + 97..122) -Count 16)) -join ""
+    write-output "New Password Generated"
     $ou = (Get-ADuser $aduser -Properties canonicalname).canonicalname
     Set-ADAccountPassword $aduser.name -NewPassword (ConvertTo-SecureString -AsPlainText "$password" -force)
+    write-output "New Password applied to account."
     Set-ADuser $aduser -Description ("Disabled on $date by $usr // $ou")
+    write-output "Description appended"
     $aduser | disable-adaccount
+    write-output "Account disabled"
     $aduser | move-adobject -targetpath "$disusr"
+    write-output "Account moved to $disusr."
     # Comment the next line if you don't have a deny local logon group
-    add-adgroupmember $DenyLocLog $aduser
+    # add-adgroupmember $DenyLocLog $aduser
+    # write-output "Disabled Account group membership updated."
     # Logging and Email Confirmation
     write-host ("$emailbody")
     ("$emailbody") | Out-File -FilePath $filepath -force -append -width 200
-    send-mailmessage -to "$recaddress" -from "$destaddress" -subject "Disable Account Confirmation" -Body "$emailbody" -smtpserver $mailserver
-    }
+    send-mailmessage -to "$Recaddress" -from "$destaddress" -subject "$user Disable Account Confirmation" -Body "$emailbody" -smtpserver $mailserver
 }
+
 Rename-Item -path $terms -NewName terms_$date.log
-new-item -path $scriptpath -name terms.txt -ItemType "file"
+write-output "Terms.txt renamed to terms_$date.log"
+new-item -path $scriptpath -name terms.txt -ItemType "file" -value "Remove this line of text. `r`nList accounts for termination line by line."
+write-output "New terms.txt created."
