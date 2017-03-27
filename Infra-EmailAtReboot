@@ -1,0 +1,18 @@
+##This file uses dot pathing to call the get-smarthostsettings command from smarthost.psm1
+##In order for this to work correctly, these files must be in the same directory
+##Ideally this was configured to run from SYSVOL in conjunction with an automated reboot script, likely in the same location
+
+$domain = (Get-WmiObject Win32_ComputerSystem).Domain
+$vpc = ((get-netipaddress).IPV4Address | where { $_ -like '10.*'}).split('.')[1]
+$hostname = $env:COMPUTERNAME
+$instanceId = (New-Object System.Net.WebClient).DownloadString("http://169.254.169.254/latest/meta-data/instance-id")
+$destaddress = get-ec2tag -Filter @{Name='resource-id';Value=$instanceid} | where key -eq "Owner" | select Value
+
+$mailserver = "smarthost$vpc.$domain"
+
+$sendaddress = "$hostname@domain.tld"
+
+$date = get-date
+send-mailmessage -to "$destaddress" -from "$sendaddress" -subject "System Reboot Successful" -Body "Server: $hostname in $domain has rebooted succesfully at $date" -smtpserver $mailserver
+
+exit 4
