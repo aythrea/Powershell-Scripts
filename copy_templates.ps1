@@ -1,4 +1,4 @@
-﻿## .\copy_templates.ps1 -app <3charappcode> -deployment_id <character id> -region <aws region 'US-EAST-1'>
+## .\copy_templates.ps1 -app <3charappcode> -deployment_id <character id> -region <aws region 'US-EAST-1'>
 ## Version 1.1
 ## Date: 27Aug2018
 ## Chamren Beavers 
